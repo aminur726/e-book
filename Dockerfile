@@ -48,35 +48,27 @@
 #      "--server.maxUploadSize=200", \
 #      "--browser.gatherUsageStats=false"]
 
-FROM python:3.12-slim
+FROM python:3.10-slim
 
-# Install WeasyPrint system deps, Node.js, Bengali fonts
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpango1.0-dev libpangocairo-1.0-0 libcairo2-dev \
-    libgdk-pixbuf-xlib-2.0-dev libffi-dev shared-mime-info \
-    poppler-utils pandoc fonts-noto fonts-noto-cjk \
-    curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
+# Install node + npm
+RUN apt-get update && apt-get install -y nodejs npm && apt-get clean
 
 WORKDIR /app
 
-# Install Python deps
+# Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy project
+# Node dependencies
+COPY package.json .
+RUN npm install
+
+# Copy application code
 COPY . .
-
-# Install Node dependencies (including docx) locally
-RUN npm install docx
 
 EXPOSE 80
 
-CMD ["streamlit", "run", "app.py", \
-     "--server.port=80", \
-     "--server.headless=true", \
-     "--server.maxUploadSize=200", \
-     "--browser.gatherUsageStats=false"]
+CMD ["python", "app.py"]
+
+
 

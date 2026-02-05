@@ -1,0 +1,9 @@
+{
+  "name": "ebook-docx-generator",
+  "version": "1.0.0",
+  "description": "DOCX generator for Python app",
+  "main": "generate_docx.js",
+  "dependencies": {
+    "docx": "^9.0.0"
+  }
+}
