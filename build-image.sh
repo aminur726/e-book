@@ -11,7 +11,7 @@ DockerHubRepository="${DockerHubUser}/${DockerHubRepoName}"
 # -------------------------------
 # DockerHub Login
 # -------------------------------
-docker login --username ${DockerHubUser} --password 2024bdfuneelbuilder
+docker login --password 2024bdfuneelbuilder --username ${DockerHubUser}
 
 # -------------------------------
 # Backend Service (Streamlit App)
@@ -21,19 +21,19 @@ BackendServiceDir="."
 
 echo "Building Docker Image for ${BackendService}"
 
-# -------------------------------
-# Build Multi-Arch Image (AMD64 + ARM64)
-# -------------------------------
-docker buildx create --use --name mybuilder || true
+# Build Image
+docker image build --no-cache -f ${BackendServiceDir}/Dockerfile \
+  -t ${BackendService}:${AppVersion} ${BackendServiceDir}
 
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  --no-cache \
-  -f ${BackendServiceDir}/Dockerfile \
-  -t ${BackendService}:${AppVersion} \
-  -t ${DockerHubRepository}:${BackendService}-${AppVersion} \
-  --push \
-  ${BackendServiceDir}
+# Tag Image
+docker image tag ${BackendService}:${AppVersion} \
+  ${DockerHubRepository}:${BackendService}-${AppVersion}
+
+# Push Image to DockerHub
+echo "Pushing Image to DockerHub..."
+docker push ${DockerHubRepository}:${BackendService}-${AppVersion}
 
 echo "✅ Build & Push Complete!"
 echo "📌 Pushed Image: ${DockerHubRepository}:${BackendService}-${AppVersion}"
+
+### End-Of-File ###
