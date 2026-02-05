@@ -1,0 +1,16 @@
+
+services:
+  ebook-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ebook_app
+    ports:
+      - "8501:8501"
+    restart: always
+    volumes:
+      - .:/app
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_HEADLESS=true
+      - STREAMLIT_MAX_UPLOAD=200
